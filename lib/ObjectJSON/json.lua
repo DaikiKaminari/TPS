@@ -1,3 +1,11 @@
+-- Original code written by ElvishJerricco ( http://www.computercraft.info/forums2/index.php?/topic/5854-json-api-v201-for-computercraft/ )
+-- Code modified by DaikiKaminari for personnal purpose, transformed it to a library that can be loaded using the "require" function
+-- v2.0.5-DAIKI-1
+
+
+------------------------------------------------------------------ library
+local json = {}
+
 ------------------------------------------------------------------ utils
 local controls = {["\n"]="\\n", ["\r"]="\\r", ["\t"]="\\t", ["\b"]="\\b", ["\f"]="\\f", ["\""]="\\\"", ["\\"]="\\\\"}
 
@@ -12,14 +20,16 @@ local function isArray(t)
 	end
 	return max == #t
 end
+json.isArray = isArray
 
 local whites = {['\n']=true; ['\r']=true; ['\t']=true; [' ']=true; [',']=true; [':']=true}
-function removeWhite(str)
+local function removeWhite(str)
 	while whites[str:sub(1, 1)] do
 		str = str:sub(2)
 	end
 	return str
 end
+json.removeWhite = removeWhite
 
 ------------------------------------------------------------------ encoding
 
@@ -80,14 +90,17 @@ local function encodeCommon(val, pretty, tabLevel, tTracking)
 	end
 	return str
 end
+json.encodeCommon = encodeCommon
 
 function encode(val)
 	return encodeCommon(val, false, 0, {})
 end
+json.encode = encode
 
 function encodePretty(val)
 	return encodeCommon(val, true, 0, {})
 end
+json.encodePretty = encodePretty
 
 ------------------------------------------------------------------ decoding
 
@@ -96,20 +109,22 @@ for k,v in pairs(controls) do
 	decodeControls[v] = k
 end
 
-function parseBoolean(str)
+local function parseBoolean(str)
 	if str:sub(1, 4) == "true" then
 		return true, removeWhite(str:sub(5))
 	else
 		return false, removeWhite(str:sub(6))
 	end
 end
+json.parseBoolean = parseBoolean
 
-function parseNull(str)
+local function parseNull(str)
 	return nil, removeWhite(str:sub(5))
 end
+json.parseNull = parseNull
 
 local numChars = {['e']=true; ['E']=true; ['+']=true; ['-']=true; ['.']=true}
-function parseNumber(str)
+local function parseNumber(str)
 	local i = 1
 	while numChars[str:sub(i, i)] or tonumber(str:sub(i, i)) do
 		i = i + 1
@@ -118,8 +133,9 @@ function parseNumber(str)
 	str = removeWhite(str:sub(i))
 	return val, str
 end
+json.parseNumber = parseNumber
 
-function parseString(str)
+local function parseString(str)
 	str = str:sub(2)
 	local s = ""
 	while str:sub(1,1) ~= "\"" do
@@ -138,15 +154,16 @@ function parseString(str)
 	end
 	return s, removeWhite(str:sub(2))
 end
+json.parseString = parseString
 
-function parseArray(str)
+local function parseArray(str)
 	str = removeWhite(str:sub(2))
 
 	local val = {}
 	local i = 1
 	while str:sub(1, 1) ~= "]" do
 		local v = nil
-		v, str = parseValue(str)
+		v, str = json.parseValue(str)
 		val[i] = v
 		i = i + 1
 		str = removeWhite(str)
@@ -154,52 +171,57 @@ function parseArray(str)
 	str = removeWhite(str:sub(2))
 	return val, str
 end
+json.parseArray = parseArray
 
-function parseObject(str)
+local function parseObject(str)
 	str = removeWhite(str:sub(2))
 
 	local val = {}
 	while str:sub(1, 1) ~= "}" do
 		local k, v = nil, nil
-		k, v, str = parseMember(str)
+		k, v, str = json.parseMember(str)
 		val[k] = v
 		str = removeWhite(str)
 	end
 	str = removeWhite(str:sub(2))
 	return val, str
 end
+json.parseObject = parseObject
 
-function parseMember(str)
+local function parseMember(str)
 	local k = nil
-	k, str = parseValue(str)
+	k, str = json.parseValue(str)
 	local val = nil
-	val, str = parseValue(str)
+	val, str = json.parseValue(str)
 	return k, val, str
 end
+json.parseMember = parseMember
 
-function parseValue(str)
+local function parseValue(str)
 	local fchar = str:sub(1, 1)
 	if fchar == "{" then
-		return parseObject(str)
+		return json.parseObject(str)
 	elseif fchar == "[" then
-		return parseArray(str)
+		return json.parseArray(str)
 	elseif tonumber(fchar) ~= nil or numChars[fchar] then
-		return parseNumber(str)
+		return json.parseNumber(str)
 	elseif str:sub(1, 4) == "true" or str:sub(1, 5) == "false" then
-		return parseBoolean(str)
+		return json.parseBoolean(str)
 	elseif fchar == "\"" then
-		return parseString(str)
+		return json.parseString(str)
 	elseif str:sub(1, 4) == "null" then
-		return parseNull(str)
+		return json.parseNull(str)
 	end
 	return nil
 end
+json.parseValue = parseValue
 
 function decode(str)
 	str = removeWhite(str)
-	t = parseValue(str)
+	t = json.parseValue(str)
 	return t
 end
+json.decode = decode
 
 function decodeFromFile(path)
 	local file = assert(fs.open(path, "r"))
@@ -207,3 +229,6 @@ function decodeFromFile(path)
 	file.close()
 	return decoded
 end
+json.decodeFromFile = decodeFromFile
+
+return json

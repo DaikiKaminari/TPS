@@ -1,5 +1,7 @@
--- [V1.2]
+-- [V1.2-BETA]
+--- LIBS LOADING ---
 local Datetime = {}
+local objectJSON
 
 -- table : days of march and october when we add/remove an hour for daylight saving
 local daylightHours = {
@@ -12,16 +14,17 @@ local daylightHours = {
 }
 
 --- INIT ---
-local function Datetime.init()
-    if not fs.exists("lib/json") then
-        error("[lib/json] file not found.")
+local function init()
+    if not fs.exists("lib/ObjectJSON/json.lua") then
+        error("[lib/ObjectJSON/json.lua] file not found.")
     end
-    if not fs.exists("lib/objectJSON") then
-        error("[lib/objectJSON] file not found.")
+    if not fs.exists("lib/ObjectJSON/ObjectJSON.lua") then
+        error("[lib/ObjectJSON/ObjectJSON.lua] file not found.")
     end
-    os.loadAPI("lib/objectJSON")
-    objectJSON.init()
+    objectJSON = require("lib/ObjectJSON/ObjectJSON")
+    print("API [datetime] loaded.")
 end
+Datetime.init = init
 
 
 --- UTILS ----
@@ -34,7 +37,7 @@ local function split(inputstr, sep)
     return t
 end
 
-function getDaylightHours(day, month, year)
+local function getDaylightHours(day, month, year)
     if month == 3 and day >= daylightHours[year]["summerBegin"] or
     month == 10 and day <= daylightHours[year]["summerEnd"] or
     (month > 3 and month < 10) then
@@ -45,7 +48,7 @@ function getDaylightHours(day, month, year)
 end
 
 --- FUNCTIONS ---
-function getDatetime()
+local function getDatetime()
     local jsonDatetime = objectJSON.decodeHTTP("http://worldtimeapi.org/api/timezone/Europe/Paris.json")
     if jsonDatetime == nil then
         return nil
@@ -69,7 +72,6 @@ function getDatetime()
     local year = date[1]
     local month = date[2]
     local day = date[3]
-    -- local daylight = getDaylightHours(tonumber(day), tonumber(month), tonumber(year))
     local time = split(split(datetime, "T")[2], ":")
     local offset = split(split(offset, ":")[1], "+")[1]
 
@@ -83,8 +85,9 @@ function getDatetime()
 
     return infos -- table with keys : dayOfWeek, year, month, day, hour, min, sec
 end
+Datetime.getDatetime = getDatetime
 
-function getDatetime2()
+local function getDatetime2()
     local jsonDatetime = objectJSON.decodeHTTP("http://worldclockapi.com/api/json/utc/now")
     if jsonDatetime == nil then
         return nil
@@ -121,3 +124,7 @@ function getDatetime2()
     infos["min"] = min
     return infos -- table with keys : dayOfWeek, year, month, day, hour, min
 end
+Datetime.getDatetime2 = getDatetime2
+
+init()
+return Datetime
