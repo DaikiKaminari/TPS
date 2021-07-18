@@ -1,4 +1,4 @@
--- [V0.01-BETA]
+-- [V1.0]
 --- LIBS LOADING ---
 datetime = require("lib/Datetime/datetime")
 local tps = {}
@@ -17,9 +17,7 @@ local function measureTPS(seconds)
     irl_end = assert(datetime.getDatetime(), "Cannot reach datetime json API.")
     ig_end = os.clock()
     local irl_timespan = diffSeconds(irl_start, irl_end)
-    print(ig_end - ig_start)
-    print(irl_timespan)
-    return (seconds / irl_timespan) * 20
+    return ((ig_end - ig_start) / irl_timespan) * 20
 end
 tps.measureTPS = measureTPS
 

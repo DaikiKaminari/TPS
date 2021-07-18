@@ -12,7 +12,10 @@ end
 
 --- MAIN ---
 local function main()
-    print(tps.measureTPS(30))
+    while true do
+        print(tps.measureTPS(60))
+        sleep(0)
+    end
 end
 
 main()
