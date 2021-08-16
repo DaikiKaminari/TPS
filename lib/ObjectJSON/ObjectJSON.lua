@@ -1,26 +1,12 @@
--- [V2.11-BETA]
+-- [V2.21]
 --- LIBS LOADING ---
-local libpath = "lib/ObjectJSON/"
 local ObjectJSON = {}
-local json -- load lib
+local json -- required lib
 
 --- INIT ---
 local function init()
-	print("\n--- INIT ObjectJSON ---")
-	if not fs.exists(libpath .. "json.lua") then
-		print("Warning : File [json] not found.")
-		print("Trying to download [json] lib.")
-		local obj = http.get("https://raw.githubusercontent.com/DaikiKaminari/CC-Libs/master/ObjectJSON/json")
-		assert(obj, "Download failed.")
-		local str = obj.readAll()
-		assert(str and str ~= "", "Download failed.")
-		local h = fs.open(libpath .. "json.lua", "w")
-		h.write(str)
-		h.close()
-		print("Download successful.")
-	end
-	json = require(libpath .. "json")
-	print("API [ObjectJSON] loaded.")
+	-- load json API
+	json = require("json")
 end
 ObjectJSON.init = init
 
@@ -101,5 +87,4 @@ local function encodeAndSavePretty(obj, filename)
 end
 ObjectJSON.encodeAndSavePretty = encodeAndSavePretty
 
-init()
 return ObjectJSON
