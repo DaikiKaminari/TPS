@@ -1,16 +1,18 @@
 --- LIBS LOADING ---
-local tps = require("tps_monitor")
+local tps
 
 --- GLOBAL VARIABLES
 local monitor -- peripheral : monitor
 
 --- FUNCTIONS ---
 local function init()
+    tps = require("tps_monitor")
+    tps.init()
     shell.run("label set tps")
     monitor = peripheral.find("monitor")
     assert(monitor, "No monitor found.")
     term.redirect(monitor)
-    term.clear
+    term.clear()
 end
 
 --- MAIN ---

@@ -1,7 +1,13 @@
--- [V1.0]
+-- [V1.1]
 --- LIBS LOADING ---
-datetime = require("lib/Datetime/datetime")
+local datetime
 local tps = {}
+
+local function init()
+    datetime = require("lib/Datetime/datetime")
+    datetime.init()
+end
+tps.init = init
 
 local function diffSeconds(datetime1, datetime2)
     local tot_secs_1 = datetime1["hour"] * 3600 + datetime1["min"] * 60 + datetime1["sec"]
