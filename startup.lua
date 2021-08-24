@@ -19,7 +19,12 @@ end
 local function main()
     init()
     while true do
-        print(tps.measureTPS(60))
+        local measured_tps = tps.measureTPS(60)
+        if not measured_tps["tps"] then
+            print(measured_tps["timestamp"] .. " -> " .. "Error.")
+        else
+            print(measured_tps["timestamp"] .. " -> " .. tostring(measured_tps["tps"]))
+        end
         sleep(0)
     end
 end
