@@ -77,7 +77,7 @@ local function getDatetime()
     infos["year"] = year
     infos["month"] = month
     infos["day"] = day
-    infos["hour"] = (tonumber(time[1]) + tonumber(offset) + 1) % 24
+    infos["hour"] = (tonumber(time[1]) + tonumber(offset)) % 24
     infos["min"] = time[2]
     infos["sec"] = split(time[3], ".")[1]
 

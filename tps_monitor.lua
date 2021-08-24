@@ -1,8 +1,7 @@
--- [V1.2]
+-- [V1.21]
 --- LIBS LOADING ---
 local datetime
 local tps = {}
-
 
 --- INIT ---
 local function init()
@@ -16,7 +15,7 @@ local function getTimestamp(datetime)
     local hour = tostring(datetime["hour"])
     local min = tostring(datetime["min"])
     local sec = tostring(datetime["sec"])
-    return string.rep("0", 2-string.len(hour)) .. hour .. string.rep("0", 2-string.len(min)) .. min .. string.rep("0", 2-string.len(sec)) .. sec
+    return string.rep("0", 2-string.len(hour)) .. hour .. ":" .. string.rep("0", 2-string.len(min)) .. min .. ":" .. string.rep("0", 2-string.len(sec)) .. sec
 end
 
 local function round(num, numDecimalPlaces)
